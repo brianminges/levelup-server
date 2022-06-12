@@ -1,9 +1,11 @@
 """View module for handling requests about game types"""
+from datetime import date
+from time import time
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from levelupapi.models import Event, Game, Gamer, GameType
+from levelupapi.models import Event, Game, Gamer, GameType, game
 
 
 class EventView(ViewSet):
@@ -66,6 +68,36 @@ class EventView(ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(organizer=organizer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    # def update(self, request, pk):
+    #     """Handle PUT operations
+        
+    #     Returns
+    #         Response -- JSON serialized game instance
+    #     """
+    #     event = Event.objects.get(pk=pk)
+    #     game = Game.objects.get(pk=request.data["game"])
+    #     event.game = game
+    #     event.description = request.data["description"]
+    #     event.date = request.data["date"]
+    #     event.time = request.data["time"]
+    #     # organizer = Gamer.objects.get(pk=request.data["gamer"])
+    #     # event.organizer = organizer
+    #     event.save()
+        
+    #     return Response(None, status=status.HTTP_204_NO_CONTENT)
+    
+    def update(self, request, pk):
+        """ Handle PUT operations
+        
+        Returns
+            Response -- JSON serialized game instance
+        """
+        event = Event.objects.get(pk=pk)
+        serializer = CreateEventSerializer(event, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)        
         
         
 
