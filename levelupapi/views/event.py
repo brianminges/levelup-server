@@ -1,6 +1,7 @@
 """View module for handling requests about game types"""
 from datetime import date
 from time import time
+from rest_framework.decorators import action
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -102,7 +103,27 @@ class EventView(ViewSet):
     def destroy(self, request, pk):
         event = Event.objects.get(pk=pk)
         event.delete()
-        return Response(None, status=status.HTTP_204_NO_CONTENT)     
+        return Response(None, status=status.HTTP_204_NO_CONTENT)    
+    
+    @action(methods=['post'], detail=True)
+    def signup(self, request, pk):
+        """Post request for a user to sign up for an event"""
+    
+        gamer = Gamer.objects.get(user=request.auth.user)
+        event = Event.objects.get(pk=pk)
+        event.attendees.add(gamer)
+        return Response({'message': 'Gamer added'}, status=status.HTTP_201_CREATED)
+    
+    @action(methods=['delete'], detail=True)
+    def leave(self, request, pk):
+        """Delete request or a user to leave an event"""
+        
+        gamer = Gamer.objects.get(user=request.auth.user)
+        event = Event.objects.get(pk=pk)
+        event.attendees.remove(gamer)
+        return Response({'message': 'Gamer removed'}, status=status.HTTP_204_NO_CONTENT)
+    
+ 
         
         
 
